@@ -9,7 +9,8 @@ CREATE TABLE `t_task` (
   `api_url` varchar(500) NOT NULL DEFAULT 	  '' COMMENT '调用地址(url)',
   `api_method` varchar(10) NOT NULL DEFAULT   '' COMMENT '调用Method', 
   `post_body` varchar(500) NOT NULL DEFAULT    '' COMMENT 'post调用的body内容',
-
+  `cache_key` varchar(100) NOT NULL DEFAULT    '' COMMENT '缓存Key',
+   
   `description` varchar(200) NOT NULL DEFAULT '' COMMENT '任务描述',
   `cron_spec` varchar(100) NOT NULL DEFAULT '' COMMENT '时间表达式',
   `concurrent` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否只允许一个实例',

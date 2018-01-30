@@ -5,13 +5,11 @@ import (
 	"app/libs"
 	"app/models"
 	"app/models/response"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
-	"github.com/mholt/archiver"
 	"github.com/robfig/cron"
 )
 
@@ -123,22 +121,34 @@ func (this *TaskController) SaveTask() {
 	task.GroupId, _ = this.GetInt("group_id")
 	
 	task.TaskType, _ = this.GetInt("task_type")
-	task.ApiHeader,_ = strings.TrimSpace(this.GetString("api_header"))
-	task.ApiUrl,_ = strings.TrimSpace(this.GetString("api_url"))
-	task.ApiMethod,_ = strings.TrimSpace(this.GetString("api_method"))
-	task.PostBody, _ = strings.TrimSpace(this.GetString("post_body"))
+	task.ApiHeader = strings.TrimSpace(this.GetString("api_header"))
+	task.ApiUrl = strings.TrimSpace(this.GetString("api_url"))
+	task.ApiMethod = strings.TrimSpace(this.GetString("api_method"))
+	task.PostBody = strings.TrimSpace(this.GetString("post_body"))
+	task.CacheKey = strings.TrimSpace(this.GetString("cachekey")) 
 	
 	task.Concurrent, _ = this.GetInt("concurrent")
 	task.CronSpec = strings.TrimSpace(this.GetString("cron_spec"))
 	task.Timeout, _ = this.GetInt("timeout")
 
 	resultData := &response.ResultData{IsSuccess: false, Msg: ""}
-	if task.TaskName == "" || task.CronSpec == "" {
-		resultData.Msg = "请填写完整信息"
+	if task.TaskName == "" || task.CronSpec == "" || task.CacheKey == "" || task.ApiUrl == "" || task.ApiMethod == "" || task.GroupId == 0  {
+		resultData.Msg = "请填写完整信息,如下相关信息必填: 任务名称、cron表达式、调用地址、提交方式、分组、缓存Key"
 		this.jsonResult(resultData)
 	}
 	if _, err := cron.Parse(task.CronSpec); err != nil {
 		resultData.Msg = "cron表达式无效"
+		this.jsonResult(resultData)
+	}
+	
+	if task.ApiMethod == "GET" {
+		task.PostBody = ""
+	}
+	
+	//CacheKey不能重复，必须唯一
+	tasktmp, errtmp := models.TaskGetByCacheKey(task.CacheKey)
+	if errtmp != nil || tasktmp != nil {
+		resultData.Msg = "出现了相同的缓存Key,请输入其它的值"
 		this.jsonResult(resultData)
 	}
 

@@ -12,6 +12,10 @@
 .clearfix {
 	*zoom:1;
 }
+.notegreen {
+	margin-left: 4px;
+	color : green;
+}
 </style>
 <div class="row">
 <div class="span12">
@@ -62,7 +66,7 @@
 						<label class="radio inline">
 							<input type="radio" value="1" name="no"> 否
 						</label>
-						<p class="help-block">设为“是”的话，如果该任务在上一个时间点还没执行完，则略过不执行</p>
+						<i class="icon-question-sign notegreen" title="设为“是”的话，如果该任务在上一个时间点还没执行完，则略过不执行"></i>
 					</div>
 				</div>
 				
@@ -86,13 +90,14 @@
 				
 				<div class="control-group">											
 					<label class="control-label" for="api_header">头信息(header)</label>
+					<i class="icon-question-sign notegreen" title="请保持这样的格式:&#13;Content-Type=application/json&#13;456=sdfadsf"></i>
 					<div class="controls">
 						<textarea class="span6" id="api_header" rows="6">{{.task.ApiHeader}}</textarea>
 					</div>
 				</div>
 				
 				<div class="control-group">											
-					<label class="control-label" for="api_url">任务名称</label>
+					<label class="control-label" for="api_url">调用地址</label>
 					<div class="controls">
 						<input type="text" value="{{.task.ApiUrl}}" class="span6" id="api_url">
 					</div>				
@@ -108,18 +113,27 @@
 					</div>				
 				</div>
 				
-				<div class="control-group">											
+				<div class="control-group postbody_div">											
 					<label class="control-label" for="post_body">Body内容</label>
+					<i class="icon-question-sign notegreen" title="如果在header中没有设置相关的Content-Type数据格式就默认为application/json"></i>
 					<div class="controls">
 						<textarea class="span6" id="post_body" rows="6">{{.task.PostBody}}</textarea>
 					</div>
 				</div>
 				
 				<div class="control-group">											
-					<label class="control-label" for="timeout">超时设置</label>
+					<label class="control-label" for="cachekey">缓存Key</label>
 					<div class="controls">
-						<input type="text"  class="span1" id="timeout" value="{{.task.Timeout}}"> 秒
-						<span class="help-block">不设置的话，默认超时时间为1天</span>
+						<input type="text"  class="span3" id="cachekey" value="{{.task.CacheKey}}">
+						<i class="icon-question-sign notegreen" title="缓存系统中用到这个值，必须唯一"></i>
+					</div>
+				</div>
+				
+				<div class="control-group">											
+					<label class="control-label" for="timeout">超时设置(秒)</label>
+					<div class="controls">
+						<input type="text"  class="span1" id="timeout" value="{{.task.Timeout}}">
+						<i class="icon-question-sign notegreen" title="不设置的话，默认超时时间为1天"></i>
 					</div>
 				</div>
 				<br />
@@ -144,6 +158,18 @@ $(function () {
 		typeName = 'yes';				
 	$("input:radio[name='" + typeName + "']").attr("checked",'checked');
 	
+	var taskId = {{.task.Id}}
+	if (taskId > 0) {
+		$("#task_type").attr("disabled", true)
+	}
+	
+	$("#task_type").val({{.task.TaskType}})
+	$("#api_method").val({{.task.ApiMethod}})
+	
+	if ($("#api_method").val() == "GET") {
+		$(".postbody_div").hide()
+	}
+	
     //保存
     $("#btn-save").click(function () {
         $(".alert").hide();
@@ -165,8 +191,9 @@ $(function () {
 				"api_header": $("#api_header").val(),
 				"api_url": $("#api_url").val(),
 				"api_method": $("#api_method").val(),
-				"post_body": $("#post_body").val()
-                "timeout": $("#timeout").val(),
+				"post_body": $("#post_body").val(),
+				"cachekey": $("#cachekey").val(),
+                "timeout": $("#timeout").val()
 			},
             success: function (result) {
                 if (result.IsSuccess) {
@@ -188,5 +215,14 @@ $(function () {
 			}
 		});
     });
+	
+	
+	$("#api_method").on("change", function(){
+		if ($(this).val() == "GET") {
+			$(".postbody_div").hide()
+		} else {
+			$(".postbody_div").show()
+		}
+	});
 });
 </script>

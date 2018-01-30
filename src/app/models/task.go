@@ -36,6 +36,7 @@ type Task struct {
 	ExecuteTimes int
 	PrevTime     int64
 	CreateTime   int64
+	CacheKey     string     //缓存key(这个必须唯一)
 }
 
 func (t *Task) TableName() string {
@@ -98,6 +99,18 @@ func TaskResetGroupId(groupId int) (int64, error) {
 func TaskGetById(id int) (*Task, error) {
 	task := &Task{
 		Id: id,
+	}
+
+	err := orm.NewOrm().Read(task)
+	if err != nil {
+		return nil, err
+	}
+	return task, nil
+}
+
+func TaskGetByCacheKey(cachekey string) (*Task, error) {
+	task := &Task{
+		CacheKey: cachekey,
 	}
 
 	err := orm.NewOrm().Read(task)

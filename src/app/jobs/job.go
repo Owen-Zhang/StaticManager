@@ -1,19 +1,22 @@
 package jobs
 
 import (
-	"bytes"
+	//"bytes"
+	//"os/exec"
+	//"app/mail"
+	//"html/template"
+	
 	"fmt"
-	"github.com/astaxie/beego"
-	"app/mail"
+	"errors"
+	"io/ioutil"	
 	"app/models"
-	"html/template"
-	"os/exec"
 	"runtime/debug"
 	"strings"
 	"time"
 	"net/http"
 	"github.com/axgle/mahonia"
 	"github.com/imroc/req"
+	"github.com/astaxie/beego"
 )
 
 type Job struct {
@@ -38,19 +41,19 @@ func NewJobFromTask(task *models.Task) (*Job, error) {
 
 func NewCommandJob(task *models.Task) *Job {
 	job := &Job{
-		id:   id,
-		name: name,
+		id:   task.Id,
+		name: task.TaskName,
 	}
 	job.runFunc = func(timeout time.Duration) (string, string, error, bool) {
 		header := make(http.Header)
-		if task.ApiHeader != "" {
+		if task.ApiHeader != "" && strings.TrimSpace(task.ApiHeader) != "" {
 			headers := strings.Split(task.ApiHeader, " ")
 			for _,val := range headers {
 				keyval := strings.Split(val, "=")
 				if len(keyval) > 0 {
 					v := keyval[0]
 					v1 := keyval[1]
-					if v != "" && strings.Trim(v) != "" && v1 != "" && strings.Trim(v1) != "" {
+					if v != "" && strings.TrimSpace(v) != "" && v1 != "" && strings.TrimSpace(v1) != "" {
 						header.Set(v, v1)
 					} else {
 						continue
@@ -62,14 +65,7 @@ func NewCommandJob(task *models.Task) *Job {
 		
 		responsestr := ""
 		var err error
-		var res http.Response
-		
-		if err == nil {
-			bodystr, _ := ioutil.ReadAll(res.Response().Body)
-			defer res.Response().Body.Close()
-
-			responsestr = string(bodystr)
-		}
+		var res *req.Resp
 		
 		//这里还没有处理超时
 		if task.ApiMethod == "POST" {
@@ -86,11 +82,24 @@ func NewCommandJob(task *models.Task) *Job {
 			}
 			
 		} else {
-			res, err := req.Get(task.ApiUrl, header)
+			res, err = req.Get(task.ApiUrl, header)
 		}
 		
-		encoder := mahonia.NewDecoder("gbk")
-		return encoder.ConvertString(responsestr), "", err, false
+		if err == nil {
+			bodystr, _ := ioutil.ReadAll(res.Response().Body)
+			defer res.Response().Body.Close()
+
+			responsestr = string(bodystr)
+			encoder := mahonia.NewDecoder("gbk")
+			
+			if res.Response().StatusCode != 200 {
+				return encoder.ConvertString(responsestr), "", errors.New(fmt.Sprintf("返回的状态码为：%s", res.Response().StatusCode)), false
+			}
+			
+			return encoder.ConvertString(responsestr), "", nil, false
+		} else {
+			return "", "", err, false
+		}
 	}
 	return job
 }
