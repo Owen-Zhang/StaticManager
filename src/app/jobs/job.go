@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 	"net/http"
-	"github.com/axgle/mahonia"
+	//"github.com/axgle/mahonia"
 	"github.com/imroc/req"
 	"github.com/astaxie/beego"
 )
@@ -47,7 +47,7 @@ func NewCommandJob(task *models.Task) *Job {
 	job.runFunc = func(timeout time.Duration) (string, string, error, bool) {
 		header := make(http.Header)
 		if task.ApiHeader != "" && strings.TrimSpace(task.ApiHeader) != "" {
-			headers := strings.Split(task.ApiHeader, " ")
+			headers := strings.Split(task.ApiHeader, "\n")
 			for _,val := range headers {
 				keyval := strings.Split(val, "=")
 				if len(keyval) > 0 {
@@ -61,7 +61,7 @@ func NewCommandJob(task *models.Task) *Job {
 				}
 			}
 		}	
-		fmt.Println(header)
+		//fmt.Println(header)
 		
 		responsestr := ""
 		var err error
@@ -90,13 +90,16 @@ func NewCommandJob(task *models.Task) *Job {
 			defer res.Response().Body.Close()
 
 			responsestr = string(bodystr)
-			encoder := mahonia.NewDecoder("gbk")
+			//fmt.Println(responsestr)
+			//encoder := mahonia.NewDecoder("gbk")
 			
 			if res.Response().StatusCode != 200 {
-				return encoder.ConvertString(responsestr), "", errors.New(fmt.Sprintf("返回的状态码为：%s", res.Response().StatusCode)), false
+				//return encoder.ConvertString(responsestr), "", errors.New(fmt.Sprintf("返回的状态码为：%s", res.Response().StatusCode)), false
+				return responsestr, "", errors.New(fmt.Sprintf("返回的状态码为：%s", res.Response().StatusCode)), false
 			}
 			
-			return encoder.ConvertString(responsestr), "", nil, false
+			//return encoder.ConvertString(responsestr), "", nil, false
+			return responsestr, "", nil, false
 		} else {
 			return "", "", err, false
 		}

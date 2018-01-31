@@ -224,5 +224,15 @@ $(function () {
 			$(".postbody_div").show()
 		}
 	});
+	
+	DisableContent();
 });
+
+function DisableContent() {
+	if ({{.isview}} ==  1) {
+		$("#btn-save").hide();
+		$("#api_method").attr('disabled', true);
+		$("#group_id").attr('disabled', true);
+	}
+}
 </script>

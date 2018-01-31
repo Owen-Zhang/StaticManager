@@ -1,3 +1,9 @@
+<style>
+	.job-btn a {
+		margin-left : 2px;
+	}
+</style>
+
 <div class="row">
 <div class="span12">      		
 	   		
@@ -51,7 +57,7 @@
 				<th>时间表达式</th>
 				<th class="span2">上次执行时间</th>
 				<th class="span2">下次执行时间</th>
-				<th class="span4">操作</th>
+				<th class="span5">操作</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -70,6 +76,7 @@
 						<a class="btn btn-edit btn-self" href="{{urlfor "TaskController.Edit"}}?id={{$v.id}}">编辑</a>
 						<a class="btn btn-run btn-self" href="javascript:;">执行</a>
 						<a class="btn btn-delete btn-self" href="javascript:;">删除</a>
+						<a class="btn btn-info btn-self" href="{{urlfor "TaskController.View"}}?id={{$v.id}}">详情</a>
 						<a class="btn btn-info btn-self" href="{{urlfor "TaskController.Logs"}}?id={{$v.id}}">日志</a>
 					</td>
 				</tr>

@@ -14,7 +14,13 @@
 		<p>
 		<h3>{{.task.TaskName}} （#{{.task.Id}}）</h3>
 
-		<pre>{{.task.Command}}</pre>
+		<pre>地址：{{.task.ApiUrl}}</pre>
+		<pre>调用方法：{{.task.ApiMethod}}</pre>
+		<pre>调用头信息：<br/>{{.task.ApiHeader}}</pre>
+		{{if eq .task.ApiMethod "POST"}}
+		<pre>调用Body信息：<br/>{{.task.PostBody}}</pre>
+		{{end}}
+		
 		</p>
 		<hr />
 		

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"fmt"
 
 	"github.com/astaxie/beego"
 	"github.com/robfig/cron"
@@ -97,6 +98,23 @@ func (this *TaskController) Edit() {
 	this.display("task/add")
 }
 
+//查看任务
+func (this *TaskController) View() {
+	id, _ := this.GetInt("id")
+
+	task, err := models.TaskGetById(id)
+	if err != nil {
+		this.showMsg(err.Error())
+	}
+
+	groups, _ := models.TaskGroupGetList(1, 100)
+	this.Data["groups"] = groups
+	this.Data["task"] = task
+	this.Data["pageTitle"] = "编辑任务"
+	this.Data["isview"] = 1
+	this.display("task/add")
+}
+
 //保存任务
 func (this *TaskController) SaveTask() {
 	id, _ := this.GetInt("id", 0)
@@ -147,7 +165,10 @@ func (this *TaskController) SaveTask() {
 	
 	//CacheKey不能重复，必须唯一
 	tasktmp, errtmp := models.TaskGetByCacheKey(task.CacheKey)
-	if errtmp != nil || tasktmp != nil {
+	fmt.Println(task.CacheKey)
+	fmt.Println(tasktmp)
+	fmt.Println(errtmp)
+	if tasktmp != nil && tasktmp.Id != task.Id {
 		resultData.Msg = "出现了相同的缓存Key,请输入其它的值"
 		this.jsonResult(resultData)
 	}

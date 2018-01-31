@@ -17,7 +17,12 @@
 		
 		<hr />
 		<h4>任务命令</h4>
-		<pre class="pre-scrollable">{{.task.Command}}</pre>
+		<pre>地址：{{.task.ApiUrl}}</pre>
+		<pre>调用方法：{{.task.ApiMethod}}</pre>
+		<pre>调用头信息：<br/>{{.task.ApiHeader}}</pre>
+		{{if eq .task.ApiMethod "POST"}}
+		<pre>调用Body信息：<br/>{{.task.PostBody}}</pre>
+		{{end}}
 		<hr />
 		
 		<h4>执行输出</h4>
