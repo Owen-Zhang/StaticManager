@@ -16,24 +16,26 @@ func Ping() error {
     return nil
 }
 
-func Get(key string) ([]byte, error) {
+func Get(key string) (string, error) {
 
     conn := pool.Get()
     defer conn.Close()
 
-    var data []byte
-    data, err := redisgo.Bytes(conn.Do("GET", key))
+    var data string
+    data, err := redisgo.String(conn.Do("GET", key))
     if err != nil {
         return data, fmt.Errorf("error getting key %s: %v", key, err)
     }
     return data, err
 }
 
-func Set(key string, value []byte) error {
+func Set(key string, value string) error {
 
     conn := pool.Get()
     defer conn.Close()
-
+	
+	//前面有错，conn会反映出来
+	
     _, err := conn.Do("SET", key, value)
     if err != nil {
         v := string(value)

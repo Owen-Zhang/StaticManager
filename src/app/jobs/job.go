@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 	"net/http"
+	"app/redis"
 	//"github.com/axgle/mahonia"
 	"github.com/imroc/req"
 	"github.com/astaxie/beego"
@@ -166,6 +167,12 @@ func (j *Job) Run() {
 	log.Error = cmdErr
 	log.ProcessTime = int(ut)
 	log.CreateTime = t.Unix()
+	
+	var errredis error = nil
+	//此时获取到了新数据，同步更新到redis
+	if err == nil {
+		errredis = redis.Set(j.task.CacheKey, cmdOut)
+	}
 
 	if isTimeout {
 		log.Status = models.TASK_TIMEOUT
@@ -173,7 +180,11 @@ func (j *Job) Run() {
 	} else if err != nil {
 		log.Status = models.TASK_ERROR
 		log.Error = err.Error() + ":" + cmdErr
+	} else if errredis != nil {
+		log.Status = models.TASK_ERROR
+		log.Error = "save redis has wrong: " + errredis.Error()
 	}
+	
 	j.logId, _ = models.TaskLogAdd(log)
 
 	// 更新上次执行时间

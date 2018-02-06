@@ -30,6 +30,10 @@ func newPool(server, password string) *redisgo.Pool {
                 c.Close()
                 return nil, err
             }
+			if _, err := c.Do("SELECT", 15); err != nil {
+				c.Close()
+				return nil, err
+			}
             return c, err
         },
         TestOnBorrow: func(c redisgo.Conn, t time.Time) error {
