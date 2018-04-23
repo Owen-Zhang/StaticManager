@@ -10,7 +10,7 @@ import (
 	"errors"
 	"io/ioutil"	
 	"app/models"
-	"runtime/debug"
+	//"runtime/debug"
 	"strings"
 	"time"
 	"net/http"
@@ -52,9 +52,9 @@ func NewCommandJob(task *models.Task) *Job {
 			for _,val := range headers {
 				keyval := strings.Split(val, "=")
 				if len(keyval) > 0 {
-					v := keyval[0]
-					v1 := keyval[1]
-					if v != "" && strings.TrimSpace(v) != "" && v1 != "" && strings.TrimSpace(v1) != "" {
+					v := strings.TrimSpace(keyval[0])
+					v1 := strings.TrimSpace(keyval[1])
+					if v != "" && v1 != "" {
 						header.Set(v, v1)
 					} else {
 						continue
@@ -126,13 +126,13 @@ func (j *Job) GetLogId() int64 {
 
 func (j *Job) Run() {
 	if !j.Concurrent && j.status > 0 {
-		beego.Warn(fmt.Sprintf("任务[%d]上一次执行尚未结束，本次被忽略。", j.id))
+		beego.Warn(fmt.Sprintf("任务[%d]上一次执行尚未结束，本次被忽略。\n", j.id))
 		return
 	}
 
 	defer func() {
 		if err := recover(); err != nil {
-			beego.Error(err, "\n", string(debug.Stack()))
+			beego.Error(err, "\n")
 		}
 	}()
 
@@ -143,7 +143,7 @@ func (j *Job) Run() {
 		}()
 	}
 
-	beego.Debug(fmt.Sprintf("开始执行任务: %d", j.id))
+	beego.Debug(fmt.Sprintf("开始执行任务: %d\n", j.id))
 
 	j.status++
 	defer func() {

@@ -21,7 +21,10 @@ func Init() {
 	if timezone != "" {
 		dsn = dsn + "&loc=" + url.QueryEscape(timezone)
 	}
-	orm.RegisterDataBase("default", "mysql", dsn)
+	err := orm.RegisterDataBase("default", "mysql", dsn)
+	if err != nil {
+		panic(err)
+	}
 
 	orm.RegisterModel(new(User), new(Task), new(TaskGroup), new(TaskLog))
 

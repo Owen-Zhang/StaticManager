@@ -7,27 +7,27 @@ import (
 	"app/models"
 	"html/template"
 	"net/http"
-	
-	"fmt"
 
 	"github.com/astaxie/beego"
-	//"fmt"
-	//"github.com/astaxie/beego/logs"
 )
 
 const VERSION = "1.0.0"
 
 func main() {
 	
+	beego.SetLogger("file", `{"filename":"logs/log.txt"}`)
+	beego.BeeLogger.DelLogger("console")
+	beego.SetLogFuncCall(true)
+	
 	defer func(){
 		if err := recover(); err != nil {
-			fmt.Println(err)
+			beego.Error("Unexpected error occurred: ", err, "\n")
 		}
 	}()
 
 	/* 日志的使用
 	log := logs.NewLogger()
-	log.SetLogger(logs.AdapterFile, `{"filename":"test.log","daily":true}`)
+	log.SetLogger(logs.AdapterFile, `{"filename":"test.txt","daily":true}`)
 	log.Async(6)
 	fmt.Println("log start:")
 	for i :=0; i < 10; i++ {

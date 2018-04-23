@@ -29,7 +29,7 @@ func AddJob(spec string, job *Job) bool {
 	}
 	err := mainCron.AddJob(spec, job)
 	if err != nil {
-		beego.Error("AddJob: ", err.Error())
+		beego.Error("AddJob: ", err.Error(), "\n")
 		return false
 	}
 	return true
