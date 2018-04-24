@@ -62,4 +62,4 @@ CREATE TABLE `t_user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `t_user` (`id`, `user_name`, `email`, `password`, `salt`, `last_login`, `last_ip`, `status`)
-VALUES (1,'admin','admin@example.com','13355ecfa8973ec8eb85133ebd84179b','',0,'',0);
+VALUES (1,'admin','admin@example.com','e10adc3949ba59abbe56e057f20f883e','',0,'',0);
